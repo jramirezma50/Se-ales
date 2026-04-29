@@ -6,7 +6,7 @@ import os
 
 def analyze_audio_fragment(file_path, start_time=190.0, duration=6.0, use_window=True, xlim_hz=5000):
     """
-    Analiza un audio con estética premium y detecta frecuencias dominantes.
+    
     """
     try:
         # Etapa 1: Carga y fragmento
