@@ -1,0 +1,3 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/PI-AstroDeconv/.venv/Scripts/python.exe"
+}

@@ -33,7 +33,7 @@ def inspect_fits(file_path):
         # Crearemos una matriz vacía llena de números aleatorios simulando 512 píxeles de ancho por 512 de alto:
         datos_simulados = np.random.normal(0, 1, (512, 512)) # Crea ruido de fondo simulado
         
-        print("📊 Dimensiones de la imagen astronómica simulada:")
+        print(" Dimensiones de la imagen astronómica simulada:")
         # '.shape' nos dice la forma de la matriz (Alto, Ancho)
         print(f"Matriz de datos (Data Array): {datos_simulados.shape}")
         print("-> Esto significa que tenemos una cuadrícula de 512 píxeles de alto por 512 de ancho.")

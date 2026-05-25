@@ -9,7 +9,7 @@
 - [x] Primer script de datos astronómicos (`scripts/01_check_fits.py`).
 - [x] Entender y simular la generación de datos (OSKAR / 21cmFAST).
 - [x] Preprocesamiento de datos y obtención del Dirty Beam (PSF).
-- [ ] Implementar la arquitectura U-Net base.
-- [ ] Modificar U-Net para incluir la capa de convolución física (FFT).
+- [x] Implementar la arquitectura U-Net base.
+- [x] Modificar U-Net para incluir la capa de convolución física (FFT).
 - [ ] Entrenamiento del modelo de forma semi-supervisada.
 - [ ] Evaluar y extraer métricas (Power Spectrum de 21cm).
