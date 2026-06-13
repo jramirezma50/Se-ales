@@ -12,36 +12,76 @@ import numpy as np
 
 def build_unet(input_shape=(512, 512, 1)):
     """
-    Construye la arquitectura base de la U-Net.
-    (Forma de U: bajada/compresión y subida/reconstrucción)
+    Construye la arquitectura U-Net MEJORADA con:
+    - 4 niveles de compresión (en lugar de 2)
+    - BatchNormalization para estabilidad
+    - Dropout para regularización
     """
     inputs = layers.Input(shape=input_shape, name="imagen_sucia_entrada")
 
     # --- ENCODER (La Bajada) ---
-    # Extraemos características y reducimos tamaño
+    # Nivel 1: 512 → 256
     c1 = layers.Conv2D(16, (3, 3), activation='relu', padding='same')(inputs)
+    c1 = layers.BatchNormalization()(c1)
+    c1 = layers.Dropout(0.2)(c1)
     p1 = layers.MaxPooling2D((2, 2))(c1)
 
+    # Nivel 2: 256 → 128
     c2 = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(p1)
+    c2 = layers.BatchNormalization()(c2)
+    c2 = layers.Dropout(0.2)(c2)
     p2 = layers.MaxPooling2D((2, 2))(c2)
 
-    # --- CUELLO DE BOTELLA ---
-    # La parte más profunda de la red, donde "comprende" la imagen
+    # Nivel 3: 128 → 64
     c3 = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(p2)
+    c3 = layers.BatchNormalization()(c3)
+    c3 = layers.Dropout(0.2)(c3)
+    p3 = layers.MaxPooling2D((2, 2))(c3)
+
+    # Nivel 4: 64 → 32
+    c4 = layers.Conv2D(128, (3, 3), activation='relu', padding='same')(p3)
+    c4 = layers.BatchNormalization()(c4)
+    c4 = layers.Dropout(0.2)(c4)
+    p4 = layers.MaxPooling2D((2, 2))(c4)
+
+    # --- CUELLO DE BOTELLA ---
+    bottleneck = layers.Conv2D(256, (3, 3), activation='relu', padding='same')(p4)
+    bottleneck = layers.BatchNormalization()(bottleneck)
+    bottleneck = layers.Dropout(0.3)(bottleneck)
+    bottleneck = layers.Conv2D(256, (3, 3), activation='relu', padding='same')(bottleneck)
+    bottleneck = layers.BatchNormalization()(bottleneck)
 
     # --- DECODER (La Subida) ---
-    # Agrandamos y usamos la información guardada (Skip connections)
-    u1 = layers.UpSampling2D((2, 2))(c3)
-    concat1 = layers.Concatenate()([u1, c2]) # Unimos con lo que recordamos del paso c2
-    c4 = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(concat1)
+    # Nivel 4: 32 → 64
+    u4 = layers.UpSampling2D((2, 2))(bottleneck)
+    u4 = layers.Concatenate()([u4, c4])
+    d4 = layers.Conv2D(128, (3, 3), activation='relu', padding='same')(u4)
+    d4 = layers.BatchNormalization()(d4)
+    d4 = layers.Dropout(0.2)(d4)
 
-    u2 = layers.UpSampling2D((2, 2))(c4)
-    concat2 = layers.Concatenate()([u2, c1]) # Unimos con lo que recordamos del paso c1
-    c5 = layers.Conv2D(16, (3, 3), activation='relu', padding='same')(concat2)
+    # Nivel 3: 64 → 128
+    u3 = layers.UpSampling2D((2, 2))(d4)
+    u3 = layers.Concatenate()([u3, c3])
+    d3 = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(u3)
+    d3 = layers.BatchNormalization()(d3)
+    d3 = layers.Dropout(0.2)(d3)
+
+    # Nivel 2: 128 → 256
+    u2 = layers.UpSampling2D((2, 2))(d3)
+    u2 = layers.Concatenate()([u2, c2])
+    d2 = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(u2)
+    d2 = layers.BatchNormalization()(d2)
+    d2 = layers.Dropout(0.2)(d2)
+
+    # Nivel 1: 256 → 512
+    u1 = layers.UpSampling2D((2, 2))(d2)
+    u1 = layers.Concatenate()([u1, c1])
+    d1 = layers.Conv2D(16, (3, 3), activation='relu', padding='same')(u1)
+    d1 = layers.BatchNormalization()(d1)
+    d1 = layers.Dropout(0.2)(d1)
 
     # La salida de la U-Net es nuestra predicción del CIELO LIMPIO
-    # Usamos activación 'relu' porque en astronomía no existe el "brillo negativo"
-    cielo_limpio_predicho = layers.Conv2D(1, (1, 1), activation='relu', name="cielo_limpio_predicho")(c5)
+    cielo_limpio_predicho = layers.Conv2D(1, (1, 1), activation='relu', name="cielo_limpio_predicho")(d1)
 
     return inputs, cielo_limpio_predicho
 
@@ -60,16 +100,26 @@ class FFTPhysicsLayer(layers.Layer):
         self.dirty_beam = beam_tensor
 
     def call(self, inputs):
-        # Aplicamos la convolución. 
+        # Aplicamos la convolución.
         # TensorFlow optimiza internamente esto con algoritmos FFT para que sea rapidísimo.
         cielo_ensuciado = tf.nn.conv2d(
-            inputs, 
-            self.dirty_beam, 
-            strides=[1, 1, 1, 1], 
+            inputs,
+            self.dirty_beam,
+            strides=[1, 1, 1, 1],
             padding='SAME',
             name="convolucion_fisica"
         )
         return cielo_ensuciado
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({"dirty_beam": self.dirty_beam.numpy().squeeze().tolist()})
+        return config
+
+    @classmethod
+    def from_config(cls, config):
+        config["dirty_beam"] = np.array(config["dirty_beam"])
+        return cls(**config)
 
 def build_pi_astrodeconv(dirty_beam, input_shape=(512, 512, 1)):
     """
@@ -87,7 +137,11 @@ def build_pi_astrodeconv(dirty_beam, input_shape=(512, 512, 1)):
     # 4. Compilamos el modelo
     # El paper menciona específicamente el optimizador Adam y la pérdida Log-Cosh 
     # por su estabilidad matemática ante valores atípicos (outliers).
-    modelo.compile(optimizer='adam', loss='logcosh')
+    modelo.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
+        loss='logcosh',
+        metrics=['mae', 'mse']
+    )
     
     return modelo
 

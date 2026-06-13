@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import fftconvolve
 from astropy.io import fits # type: ignore
 
-def create_clean_sky(size=512):
+def create_clean_sky(size=128):
     """
     Crea una imagen de un cielo negro con algunas fuentes luminosas brillantes.
     """
@@ -30,7 +30,7 @@ def create_clean_sky(size=512):
         sky[x, y] += brightness
     return sky
 
-def create_dirty_beam(size=512):
+def create_dirty_beam(size=128):
     """
     Simula el defecto del telescopio (Point Spread Function / Dirty Beam).
     Un telescopio de interferometría suele tener un pico central fuerte y ondas a su alrededor (sidelobes).

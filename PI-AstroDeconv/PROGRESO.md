@@ -11,5 +11,14 @@
 - [x] Preprocesamiento de datos y obtención del Dirty Beam (PSF).
 - [x] Implementar la arquitectura U-Net base.
 - [x] Modificar U-Net para incluir la capa de convolución física (FFT).
+- [x] Análisis profundo vs Paper completado.
+- [ ] Profundizar arquitectura (agregar niveles de compresión).
+- [ ] Agregar BatchNormalization y Dropout.
 - [ ] Entrenamiento del modelo de forma semi-supervisada.
 - [ ] Evaluar y extraer métricas (Power Spectrum de 21cm).
+
+## Documentación Generada (2026-06-05):
+- [x] RESUMEN_EJECUTIVO.md (55% completitud actual)
+- [x] ANALISIS_PROFUNDO.md (análisis línea por línea)
+- [x] CODIGO_MEJORADO.md (550+ líneas de código mejorado)
+- [x] VERIFICACION_FINAL.md (checklist y próximos pasos)

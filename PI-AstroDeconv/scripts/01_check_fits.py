@@ -75,7 +75,7 @@ if __name__ == "__main__":
     # simulará que estamos tratando de abrir el Dirty Beam proveniente del paso de preprocesamiento de WSClean.
     
     # Inventamos la ruta al archivo FITS que algún día guardaremos allí
-    archivo_prueba = "../data/raw/dirty_beam_166MHz.fits"
+    archivo_prueba = "../data/raw/dirty_beam.fits"
     
     # Llamamos a nuestra función
     inspect_fits(archivo_prueba)

@@ -1,0 +1,8 @@
+__pycache__/
+.venv/
+.env.config
+models/logs/
+models/*.h5
+data/raw/comparacion_simulacion.png
+data/raw/dirty_beam.fits
+data/raw/dirty_sky.fits
