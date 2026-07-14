@@ -1,0 +1,14 @@
+name: pi-astrodeconv
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - tensorflow==2.15.0
+    - astropy
+    - numpy==1.26.4
+    - matplotlib
+    - scipy
+    - scikit-image
